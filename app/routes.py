@@ -165,6 +165,12 @@ def reports():
                           stock_value=stock_value, low_stock_items=low_stock_items,
                           recent_sales=recent_sales, recent_purchases=recent_purchases)
 
+#----------------about_us_module----------------------------
+@app.route('/about')
+@login_required  # optional, remove if public
+def about():
+    return render_template('about.html')
+
 # ---------------- Temporary Test User ----------------
 @app.route('/register-test-user')
 def register_test_user():
