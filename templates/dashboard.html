@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Simple ERP{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1><i class="bi bi-house-door-fill"></i> Dashboard</h1>
+        <p class="lead">Welcome to your Simple ERP system, {{ current_user.username }}!</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-box-seam"></i> Total Items</h5>
+                <h2>{{ total_items or 0 }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-cart-check"></i> Total Orders</h5>
+                <h2>{{ total_orders or 0 }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-arrow-down-circle"></i> Total Purchases</h5>
+                <h2>{{ total_purchases or 0 }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-currency-rupee"></i> Stock Value</h5>
+                <h2>₹{{ "%.2f"|format(total_stock_value or 0) }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <p>Use the navigation bar to manage inventory, sales, purchases, or view reports.</p>
+    </div>
+</div>
+{% endblock %}

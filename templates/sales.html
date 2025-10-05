@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Sales - Simple ERP{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1><i class="bi bi-cart"></i> Sales Management</h1>
+        <p class="lead">Create orders and track sales. Stock will auto-update from inventory.</p>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Create New Order</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" novalidate>
+                    <div class="mb-3">
+                        <label for="item_id" class="form-label">Select Item</label>
+                        <select class="form-select" id="item_id" name="item_id" required>
+                            <option value="">Choose an item...</option>
+                            {% for item in items %}
+                                <option value="{{ item.id }}">
+                                    {{ item.name }} (Stock: {{ item.quantity }}, Price: ₹{{ "%.2f"|format(item.price) }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">Order Quantity</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" min="1" required
+                               placeholder="Enter quantity to sell">
+                    </div>
+                    <button type="submit" class="btn btn-success">Create Order</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Quick Stats</h5>
+            </div>
+            <div class="card-body">
+                <p>Total Orders: {{ orders|length if orders else 0 }}</p>
+                <p>Available Items: {{ items|length if items else 0 }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Recent Orders</h5>
+            </div>
+            <div class="card-body">
+                {% if orders %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                                <th>Total (₹)</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                                <tr>
+                                    <td>{{ order.id }}</td>
+                                    <td>{{ order.item.name }}</td>
+                                    <td><span class="badge bg-info">{{ order.quantity }}</span></td>
+                                    <td>₹{{ "%.2f"|format(order.total_amount()) }}</td>
+                                    <td>{{ order.order_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">View</button>
+                                        <button class="btn btn-sm btn-outline-danger">Cancel</button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-muted">No orders yet. Create one above!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports - Simple ERP{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1><i class="bi bi-graph-up"></i> Reports</h1>
+        <p class="lead">Summary of sales, purchases, and inventory valuation.</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5 class="card-title">Sales Summary</h5>
+                <p class="card-text">Total Orders: {{ sales_count }}</p>
+                <p class="card-text">Total Sales Value: ₹{{ "%.2f"|format(sales_total) }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5 class="card-title">Purchases Summary</h5>
+                <p class="card-text">Total Purchases: {{ purchases_count }}</p>
+                <p class="card-text">Total Purchases Value: ₹{{ "%.2f"|format(purchases_total) }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5 class="card-title">Inventory Valuation</h5>
+                <p class="card-text">Total Stock Value: ₹{{ "%.2f"|format(stock_value) }}</p>
+                <p class="card-text">Low Stock Items: {{ low_stock_items|length }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Recent Sales</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_sales %}
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                <th>Total (₹)</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_sales %}
+                                <tr>
+                                    <td>{{ order.item.name }}</td>
+                                    <td>{{ order.quantity }}</td>
+                                    <td>₹{{ "%.2f"|format(order.total_amount()) }}</td>
+                                    <td>{{ order.order_date.strftime('%Y-%m-%d') }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-muted">No recent sales.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Recent Purchases</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_purchases %}
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                <th>Total (₹)</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for purchase in recent_purchases %}
+                                <tr>
+                                    <td>{{ purchase.item.name }}</td>
+                                    <td>{{ purchase.quantity }}</td>
+                                    <td>₹{{ "%.2f"|format(purchase.total_amount()) }}</td>
+                                    <td>{{ purchase.purchase_date.strftime('%Y-%m-%d') }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-muted">No recent purchases.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Low Stock Alert</h5>
+            </div>
+            <div class="card-body">
+                {% if low_stock_items %}
+                    <ul class="list-group">
+                        {% for item in low_stock_items %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ item.name }} ({{ item.quantity }} units @ ₹{{ "%.2f"|format(item.price) }})
+                                <span class="badge bg-warning text-dark">Low Stock</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-success">All stock levels are good!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
