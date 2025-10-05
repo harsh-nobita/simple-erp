@@ -41,6 +41,7 @@ class Order(db.Model):
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     order_date = db.Column(db.DateTime, default=datetime.utcnow)  # Auto-set date
+    invoiced = db.Column(db.Boolean, default=False)  # New field
 
     # One-to-many: Order -> Item (backref auto-creates Item.orders)
     item = db.relationship('Item', backref='orders', lazy='select')

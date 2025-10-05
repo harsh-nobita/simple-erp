@@ -1,26 +1,28 @@
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, send_file
 from flask_login import login_user, logout_user, login_required, current_user
 from app import app, db
 from app.models import User, Item, Order, Purchase
-from datetime import datetime
-from decimal import Decimal  # For precise currency math
+from datetime import datetime, date
+from decimal import Decimal
+from xhtml2pdf import pisa
+import io
 
-# Dashboard route (protected by login)
+# ---------------- Dashboard ----------------
 @app.route('/')
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    # Simple dashboard showing user and summary
     total_items = Item.query.count()
     total_orders = Order.query.count()
     total_purchases = Purchase.query.count()
-    total_stock_value = sum(item.total_value() for item in Item.query.all())  # New: Total stock value
-    return render_template('dashboard.html', total_items=total_items, total_orders=total_orders, total_purchases=total_purchases, total_stock_value=total_stock_value)
+    total_stock_value = sum(item.total_value() for item in Item.query.all())
+    return render_template('dashboard.html', 
+                           total_items=total_items, total_orders=total_orders, 
+                           total_purchases=total_purchases, total_stock_value=total_stock_value)
 
-# Login route
+# ---------------- Login ----------------
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    # Redirect if already logged in
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
     
@@ -38,7 +40,7 @@ def login():
     
     return render_template('login.html')
 
-# Logout route
+# ---------------- Logout ----------------
 @app.route('/logout')
 @login_required
 def logout():
@@ -46,7 +48,7 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
 
-# Inventory route (add/view items, now with price)
+# ---------------- Inventory ----------------
 @app.route('/inventory', methods=['GET', 'POST'])
 @login_required
 def inventory():
@@ -54,7 +56,7 @@ def inventory():
         name = request.form.get('name')
         quantity = request.form.get('quantity')
         price = request.form.get('price', 0)
-        description = request.form.get('description', '')  # Optional
+        description = request.form.get('description', '')
         
         if name and quantity:
             try:
@@ -72,15 +74,14 @@ def inventory():
         else:
             flash('Please provide item name and quantity.', 'error')
     
-    # Fetch all items
     items = Item.query.all()
     return render_template('inventory.html', items=items)
 
-# Sales route (create/view orders, deduct from inventory, calculate total)
+# ---------------- Sales ----------------
 @app.route('/sales', methods=['GET', 'POST'])
 @login_required
 def sales():
-    items = Item.query.all()  # All available items for dropdown
+    items = Item.query.all()
     
     if request.method == 'POST':
         item_id = request.form.get('item_id')
@@ -96,11 +97,8 @@ def sales():
                 elif order_quantity_int > item.quantity:
                     flash(f'Insufficient stock! Only {item.quantity} available for {item.name}.', 'error')
                 else:
-                    # Create order
                     order = Order(item_id=item.id, quantity=order_quantity_int)
                     db.session.add(order)
-                    
-                    # Deduct from inventory
                     item.quantity -= order_quantity_int
                     db.session.commit()
                     
@@ -111,20 +109,19 @@ def sales():
         else:
             flash('Please select an item and enter quantity.', 'error')
     
-    # Fetch all orders for display
     orders = Order.query.all()
     return render_template('sales.html', items=items, orders=orders)
 
-# Purchases route (create/view purchases, add to inventory, calculate total)
+# ---------------- Purchases ----------------
 @app.route('/purchases', methods=['GET', 'POST'])
 @login_required
 def purchases():
-    items = Item.query.all()  # All items for dropdown
+    items = Item.query.all()
     
     if request.method == 'POST':
         item_id = request.form.get('item_id')
         purchase_quantity = request.form.get('quantity')
-        supplier = request.form.get('supplier', '')  # Optional
+        supplier = request.form.get('supplier', '')
         
         if item_id and purchase_quantity:
             try:
@@ -134,11 +131,8 @@ def purchases():
                 if purchase_quantity_int <= 0:
                     flash('Purchase quantity must be positive.', 'error')
                 else:
-                    # Create purchase
                     purchase = Purchase(item_id=item.id, quantity=purchase_quantity_int, supplier=supplier)
                     db.session.add(purchase)
-                    
-                    # Add to inventory
                     item.quantity += purchase_quantity_int
                     db.session.commit()
                     
@@ -149,30 +143,20 @@ def purchases():
         else:
             flash('Please select an item and enter quantity.', 'error')
     
-    # Fetch all purchases for display
     purchases_list = Purchase.query.all()
     return render_template('purchases.html', items=items, purchases=purchases_list)
 
-# Reports route (new: summaries)
+# ---------------- Reports ----------------
 @app.route('/reports')
 @login_required
 def reports():
-    # Sales summary
     sales_total = sum(order.total_amount() for order in Order.query.all())
     sales_count = Order.query.count()
-    
-    # Purchases summary
     purchases_total = sum(purchase.total_amount() for purchase in Purchase.query.all())
     purchases_count = Purchase.query.count()
-    
-    # Stock valuation
     stock_value = sum(item.total_value() for item in Item.query.all())
-    low_stock_items = [item for item in Item.query.all() if item.quantity < 5]  # e.g., <5 units
-    
-    # Recent sales (last 5)
+    low_stock_items = [item for item in Item.query.all() if item.quantity < 5]
     recent_sales = Order.query.order_by(Order.order_date.desc()).limit(5).all()
-    
-    # Recent purchases (last 5)
     recent_purchases = Purchase.query.order_by(Purchase.purchase_date.desc()).limit(5).all()
     
     return render_template('reports.html', 
@@ -181,7 +165,7 @@ def reports():
                           stock_value=stock_value, low_stock_items=low_stock_items,
                           recent_sales=recent_sales, recent_purchases=recent_purchases)
 
-# Temporary route to create a test user (visit once, then remove)
+# ---------------- Temporary Test User ----------------
 @app.route('/register-test-user')
 def register_test_user():
     if User.query.filter_by(username='testuser').first():
@@ -192,3 +176,61 @@ def register_test_user():
     db.session.add(user)
     db.session.commit()
     return 'Test user created! Username: testuser, Password: testpassword. Visit /login now.'
+
+# ---------------- Invoice Module ----------------
+@app.route('/invoice', methods=['GET', 'POST'])
+@login_required
+def invoice():
+    pending_orders = Order.query.filter_by(invoiced=False).all()
+
+    if request.method == "POST":
+        po_number = request.form.get("po_number")
+        po_date = request.form.get("po_date")
+        company_name = request.form.get("company_name")
+        selected_order_ids = request.form.getlist("order_ids")
+
+        if not po_number or not po_date or not company_name:
+            flash('Please fill in all fields.', 'error')
+            return redirect(url_for('invoice'))
+
+        if not selected_order_ids:
+            flash('Please select at least one order to invoice.', 'error')
+            return redirect(url_for('invoice'))
+
+        orders = Order.query.filter(Order.id.in_(selected_order_ids)).all()
+
+        items = []
+        total = 0
+        for order in orders:
+            item_total = order.total_amount()
+            items.append({
+                "name": order.item.name,
+                "qty": order.quantity,
+                "price": order.item.price,
+                "total": item_total
+            })
+            total += item_total
+            order.invoiced = True
+
+        db.session.commit()
+
+        rendered = render_template(
+            'invoice.html',
+            po_number=po_number,
+            po_date=po_date,
+            company_name=company_name,
+            items=items,
+            total=total
+        )
+
+        pdf = io.BytesIO()
+        pisa_status = pisa.CreatePDF(io.BytesIO(rendered.encode('utf-8')), dest=pdf)
+        pdf.seek(0)
+
+        if pisa_status.err:
+            flash("Error generating PDF. Please check invoice HTML.", "error")
+            return redirect(url_for('invoice'))
+
+        return send_file(pdf, download_name=f"Invoice_{po_number}.pdf", as_attachment=True)
+
+    return render_template('invoice_form.html', pending_orders=pending_orders, current_date=date.today())
