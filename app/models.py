@@ -2,12 +2,20 @@ from app import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+from enum import Enum
+
+# ----------------- User Roles Enum -----------------
+class UserRole(Enum):
+    ADMIN = 'Admin'
+    MANAGER = 'Manager'
+    STAFF = 'Staff'
 
 # User model (inherits from UserMixin for Flask-Login support)
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)  # Renamed for clarity
+    role = db.Column(db.String(20), default=UserRole.STAFF.value)
 
     # Methods for password handling
     def set_password(self, password):
@@ -16,8 +24,11 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    def __repr__(self):
-        return f'<User {self.username}>'
+    def is_admin(self):
+        return self.role == UserRole.ADMIN.value
+
+    def is_manager(self):
+        return self.role == UserRole.MANAGER.value
 
 # Item model for inventory (add price)
 class Item(db.Model):

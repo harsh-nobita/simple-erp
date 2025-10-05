@@ -15,22 +15,31 @@
                         <label for="username" class="form-label">Username</label>
                         <input type="text" class="form-control" id="username" name="username" required
                                placeholder="Enter username" value="{{ request.form.username if request.form else '' }}">
-                        {% if request.form and not username %}
-                            <div class="form-text text-danger">Username is required.</div>
-                        {% endif %}
                     </div>
+
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" id="password" name="password" required
                                placeholder="Enter password">
-                        {% if request.form and not password %}
-                            <div class="form-text text-danger">Password is required.</div>
-                        {% endif %}
                     </div>
+
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Role</label>
+                        <select class="form-select" id="role" name="role" required>
+                            <option value="" disabled selected>Select your role</option>
+                            <option value="Admin" {% if request.form.role == 'Admin' %}selected{% endif %}>Admin</option>
+                            <option value="Manager" {% if request.form.role == 'Manager' %}selected{% endif %}>Manager</option>
+                            <option value="Staff" {% if request.form.role == 'Staff' %}selected{% endif %}>Staff</option>
+                        </select>
+                    </div>
+
                     <button type="submit" class="btn btn-primary w-100">Login</button>
                 </form>
+
                 <div class="text-center mt-3">
-                    <small class="text-muted">Test Account: Username: <strong>testuser</strong>, Password: <strong>testpassword</strong></small>
+                    <small class="text-muted">
+                        Test Account: Username: <strong>testuser</strong>, Password: <strong>testpassword</strong>
+                    </small>
                 </div>
             </div>
         </div>

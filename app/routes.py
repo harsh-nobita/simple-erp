@@ -6,6 +6,19 @@ from datetime import datetime, date
 from decimal import Decimal
 from xhtml2pdf import pisa
 import io
+from functools import wraps
+
+# ---------------- Role-based access decorator ----------------
+def roles_required(*roles):
+    def wrapper(f):
+        @wraps(f)
+        def decorated_view(*args, **kwargs):
+            if current_user.role not in roles:
+                flash("You do not have permission to access this page.", "error")
+                return redirect(url_for("dashboard"))
+            return f(*args, **kwargs)
+        return decorated_view
+    return wrapper
 
 # ---------------- Dashboard ----------------
 @app.route('/')
@@ -20,24 +33,35 @@ def dashboard():
                            total_items=total_items, total_orders=total_orders, 
                            total_purchases=total_purchases, total_stock_value=total_stock_value)
 
-# ---------------- Login ----------------
+# ---------------- Login with Role ----------------
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
-    
+
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+        role = request.form.get('role')
+
         user = User.query.filter_by(username=username).first()
-        
+
+        if not role:
+            flash('Please select a role.', 'error')
+            return redirect(url_for('login'))
+
         if user and user.check_password(password):
+            if user.role != role:
+                flash(f'Incorrect role selected. Your role is {user.role}.', 'error')
+                return redirect(url_for('login'))
+
             login_user(user)
             flash('Login successful!', 'success')
             return redirect(url_for('dashboard'))
         else:
             flash('Invalid username or password.', 'error')
-    
+            return redirect(url_for('login'))
+
     return render_template('login.html')
 
 # ---------------- Logout ----------------
@@ -51,6 +75,7 @@ def logout():
 # ---------------- Inventory ----------------
 @app.route('/inventory', methods=['GET', 'POST'])
 @login_required
+@roles_required('Admin', 'Manager')
 def inventory():
     if request.method == 'POST':
         name = request.form.get('name')
@@ -80,6 +105,7 @@ def inventory():
 # ---------------- Sales ----------------
 @app.route('/sales', methods=['GET', 'POST'])
 @login_required
+@roles_required('Admin', 'Manager', 'Staff')
 def sales():
     items = Item.query.all()
     
@@ -115,6 +141,7 @@ def sales():
 # ---------------- Purchases ----------------
 @app.route('/purchases', methods=['GET', 'POST'])
 @login_required
+@roles_required('Admin', 'Manager')
 def purchases():
     items = Item.query.all()
     
@@ -149,6 +176,7 @@ def purchases():
 # ---------------- Reports ----------------
 @app.route('/reports')
 @login_required
+@roles_required('Admin')
 def reports():
     sales_total = sum(order.total_amount() for order in Order.query.all())
     sales_count = Order.query.count()
@@ -165,9 +193,9 @@ def reports():
                           stock_value=stock_value, low_stock_items=low_stock_items,
                           recent_sales=recent_sales, recent_purchases=recent_purchases)
 
-#----------------about_us_module----------------------------
+#---------------- About Page ----------------
 @app.route('/about')
-@login_required  # optional, remove if public
+@login_required  # optional
 def about():
     return render_template('about.html')
 
@@ -177,7 +205,7 @@ def register_test_user():
     if User.query.filter_by(username='testuser').first():
         return 'Test user already exists. Username: testuser, Password: testpassword'
     
-    user = User(username='testuser')
+    user = User(username='testuser', role='Admin')  # Assign Admin role
     user.set_password('testpassword')
     db.session.add(user)
     db.session.commit()
@@ -186,6 +214,7 @@ def register_test_user():
 # ---------------- Invoice Module ----------------
 @app.route('/invoice', methods=['GET', 'POST'])
 @login_required
+@roles_required('Admin', 'Manager')
 def invoice():
     pending_orders = Order.query.filter_by(invoiced=False).all()
 
