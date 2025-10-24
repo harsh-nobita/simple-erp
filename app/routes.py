@@ -279,6 +279,54 @@ def inventory():
     items = Item.query.all()
     return render_template('inventory.html', items=items)
 
+# ----- Edit inventory Item -----
+@app.route('/inventory/edit/<int:item_id>', methods=['GET', 'POST'])
+@login_required
+@roles_required('Admin', 'Manager')
+def edit_item(item_id):
+    item = Item.query.get_or_404(item_id)
+
+    if request.method == 'POST':
+        name = request.form.get('name')
+        quantity = request.form.get('quantity')
+        price = request.form.get('price')
+        description = request.form.get('description')
+
+        # Validation
+        if not name or not quantity or not price:
+            flash('Name, Quantity, and Price are required fields.', 'danger')
+            return redirect(url_for('inventory'))
+
+        try:
+            item.name = name
+            item.quantity = int(quantity)
+            item.price = Decimal(price)
+            item.description = description
+            db.session.commit()
+            flash('Item updated successfully!', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating item: {str(e)}', 'danger')
+
+        return redirect(url_for('inventory'))
+
+    return render_template('edit_item.html', item=item)
+
+# ----- Delete inventory Item -----
+@app.route('/inventory/delete/<int:item_id>', methods=['POST'])
+@login_required
+@roles_required('Admin', 'Manager')
+def delete_item(item_id):
+    item = Item.query.get_or_404(item_id)
+    try:
+        db.session.delete(item)
+        db.session.commit()
+        flash('Item deleted successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting item: {str(e)}', 'danger')
+    return redirect(url_for('inventory'))
+
 # ---------------- Sales ----------------
 @app.route('/sales', methods=['GET', 'POST'])
 @login_required
@@ -292,43 +340,47 @@ def sales():
         order_quantity = request.form.get('quantity')
         customer_id = request.form.get('customer_id')
 
-        if item_id and order_quantity:
-            try:
-                item = Item.query.get_or_404(int(item_id))
-                order_quantity_int = int(order_quantity)
-
-                if order_quantity_int <= 0:
-                    flash('Order quantity must be positive.', 'error')
-                elif order_quantity_int > item.quantity:
-                    flash(f'Insufficient stock! Only {item.quantity} available for {item.name}.', 'error')
-                else:
-                    order = Order(item_id=item.id, quantity=order_quantity_int)
-
-                    # Assign customer to order if selected
-                    if customer_id and customer_id != "":
-                        try:
-                            cid = int(customer_id)
-                            customer = Customer.query.get(cid)
-                            if customer:
-                                order.customer_id = customer.id
-                        except ValueError:
-                            flash('Invalid customer selection.', 'error')
-
-                    db.session.add(order)
-                    item.quantity -= order_quantity_int
-                    db.session.commit()
-
-                    total = order.total_amount()
-                    flash(f'Order created successfully! Sold {order_quantity_int} x {item.name} for ₹{total}.', 'success')
-            except ValueError:
-                flash('Invalid quantity. Please enter a valid number.', 'error')
-        else:
+        if not item_id or not order_quantity:
             flash('Please select an item and enter a quantity.', 'error')
+            return redirect(url_for('sales'))
 
-    # 👇 Fetch all orders with customer relationship
+        try:
+            item = Item.query.get_or_404(int(item_id))
+            quantity_int = int(order_quantity)
+
+            if quantity_int <= 0:
+                flash('Quantity must be greater than zero.', 'error')
+                return redirect(url_for('sales'))
+
+            if quantity_int > item.quantity:
+                flash(f'Not enough stock for {item.name}. Only {item.quantity} left.', 'error')
+                return redirect(url_for('sales'))
+
+            # Create order
+            order = Order(item_id=item.id, quantity=quantity_int)
+
+            # Assign customer if selected
+            if customer_id:
+                try:
+                    cust = Customer.query.get(int(customer_id))
+                    if cust:
+                        order.customer_id = cust.id
+                except Exception:
+                    flash('Invalid customer selected.', 'error')
+
+            db.session.add(order)
+            item.quantity -= quantity_int
+            db.session.commit()
+
+            flash(f'Order created successfully for {quantity_int} x {item.name}!', 'success')
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error creating order: {str(e)}', 'danger')
+
     orders = Order.query.order_by(Order.order_date.desc()).all()
-
     return render_template('sales.html', items=items, customers=customers, orders=orders)
+
 # ---------------- View Order ----------------
 @app.route('/sales/view/<int:order_id>')
 @login_required
@@ -345,14 +397,15 @@ def cancel_order(order_id):
     order = Order.query.get_or_404(order_id)
     item = Item.query.get(order.item_id)
 
-    # Restore stock if order exists
-    if item and order:
-        item.quantity += order.quantity
+    try:
+        if item:
+            item.quantity += order.quantity
         db.session.delete(order)
         db.session.commit()
         flash(f'Order #{order.id} cancelled successfully. Stock restored.', 'success')
-    else:
-        flash('Order or item not found.', 'error')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error cancelling order: {str(e)}', 'danger')
 
     return redirect(url_for('sales'))
 
