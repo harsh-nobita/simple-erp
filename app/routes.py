@@ -329,6 +329,32 @@ def sales():
     orders = Order.query.order_by(Order.order_date.desc()).all()
 
     return render_template('sales.html', items=items, customers=customers, orders=orders)
+# ---------------- View Order ----------------
+@app.route('/sales/view/<int:order_id>')
+@login_required
+@roles_required('Admin', 'Manager', 'Staff')
+def view_order(order_id):
+    order = Order.query.get_or_404(order_id)
+    return render_template('view_order.html', order=order)
+
+# ---------------- Cancel Order ----------------
+@app.route('/sales/cancel/<int:order_id>', methods=['POST'])
+@login_required
+@roles_required('Admin', 'Manager')
+def cancel_order(order_id):
+    order = Order.query.get_or_404(order_id)
+    item = Item.query.get(order.item_id)
+
+    # Restore stock if order exists
+    if item and order:
+        item.quantity += order.quantity
+        db.session.delete(order)
+        db.session.commit()
+        flash(f'Order #{order.id} cancelled successfully. Stock restored.', 'success')
+    else:
+        flash('Order or item not found.', 'error')
+
+    return redirect(url_for('sales'))
 
 # ---------------- Purchases ----------------
 @app.route('/purchases', methods=['GET', 'POST'])

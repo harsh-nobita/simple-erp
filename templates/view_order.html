@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Order Details - HNS ERP{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5>Order #{{ order.id }} Details</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>Item:</strong> {{ order.item.name }}</p>
+            <p><strong>Quantity:</strong> {{ order.quantity }}</p>
+            <p><strong>Total Amount:</strong> ₹{{ "%.2f"|format(order.total_amount()) }}</p>
+            <p><strong>Order Date:</strong> {{ order.order_date.strftime('%Y-%m-%d %H:%M') }}</p>
+            <p><strong>Customer:</strong>
+                {% if order.customer %}
+                    {{ order.customer.name }}{% if order.customer.phone %} ({{ order.customer.phone }}){% endif %}
+                {% else %}
+                    N/A
+                {% endif %}
+            </p>
+        </div>
+        <div class="card-footer text-end">
+            <a href="{{ url_for('sales') }}" class="btn btn-secondary">Back to Sales</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
