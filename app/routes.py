@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, url_for, flash, send_file
 from flask_login import login_user, logout_user, login_required, current_user
 from app import app, db
-from app.models import User, Item, Order, Purchase
+from app.models import User, Item, Order, Purchase, Customer, Supplier
 from datetime import datetime, date
 from decimal import Decimal
 from xhtml2pdf import pisa
@@ -29,8 +29,8 @@ def dashboard():
     total_orders = Order.query.count()
     total_purchases = Purchase.query.count()
     total_stock_value = sum(item.total_value() for item in Item.query.all())
-    return render_template('dashboard.html', 
-                           total_items=total_items, total_orders=total_orders, 
+    return render_template('dashboard.html',
+                           total_items=total_items, total_orders=total_orders,
                            total_purchases=total_purchases, total_stock_value=total_stock_value)
 
 # ---------------- Login with Role ----------------
@@ -72,6 +72,183 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
 
+# ---------------- Customers (List / Add) ----------------
+@app.route('/customers', methods=['GET', 'POST'])
+@login_required
+def customers():
+    # GET: show customers list and add form (if role permits)
+    if request.method == 'POST':
+        # Only Admin and Manager can add customers
+        if current_user.role not in ('Admin', 'Manager'):
+            flash('You do not have permission to add customers.', 'error')
+            return redirect(url_for('customers'))
+
+        name = request.form.get('name')
+        phone = request.form.get('phone')
+        email = request.form.get('email')
+        address = request.form.get('address')
+        gst_number = request.form.get('gst_number')
+
+        if not name:
+            flash('Customer name is required.', 'error')
+            return redirect(url_for('customers'))
+
+        customer = Customer(name=name, phone=phone, email=email, address=address, gst_number=gst_number)
+        db.session.add(customer)
+        db.session.commit()
+        flash('Customer added successfully.', 'success')
+        return redirect(url_for('customers'))
+
+    customers_list = Customer.query.order_by(Customer.created_at.desc()).all()
+    return render_template('customers.html', customers=customers_list)
+
+# ---------------- Customer: Add (separate page) ----------------
+@app.route('/customers/add', methods=['GET', 'POST'])
+@login_required
+@roles_required('Admin', 'Manager')
+def add_customer():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        phone = request.form.get('phone')
+        email = request.form.get('email')
+        address = request.form.get('address')
+        gst_number = request.form.get('gst_number')
+
+        if not name:
+            flash('Customer name is required.', 'error')
+            return redirect(url_for('add_customer'))
+
+        customer = Customer(name=name, phone=phone, email=email, address=address, gst_number=gst_number)
+        db.session.add(customer)
+        db.session.commit()
+        flash('Customer created successfully.', 'success')
+        return redirect(url_for('customers'))
+
+    return render_template('customer_form.html', action='Add', customer=None)
+
+# ---------------- Customer: Edit ----------------
+@app.route('/customers/edit/<int:customer_id>', methods=['GET', 'POST'])
+@login_required
+@roles_required('Admin', 'Manager')
+def edit_customer(customer_id):
+    customer = Customer.query.get_or_404(customer_id)
+    if request.method == 'POST':
+        customer.name = request.form.get('name') or customer.name
+        customer.phone = request.form.get('phone') or customer.phone
+        customer.email = request.form.get('email') or customer.email
+        customer.address = request.form.get('address') or customer.address
+        customer.gst_number = request.form.get('gst_number') or customer.gst_number
+
+        db.session.commit()
+        flash('Customer updated successfully.', 'success')
+        return redirect(url_for('customers'))
+
+    return render_template('customer_form.html', action='Edit', customer=customer)
+
+# ---------------- Customer: Delete ----------------
+@app.route('/customers/delete/<int:customer_id>', methods=['POST'])
+@login_required
+@roles_required('Admin', 'Manager')
+def delete_customer(customer_id):
+    customer = Customer.query.get_or_404(customer_id)
+    # Optional: prevent delete if customer has orders
+    if customer.orders:
+        flash('Cannot delete customer with existing orders.', 'error')
+        return redirect(url_for('customers'))
+
+    db.session.delete(customer)
+    db.session.commit()
+    flash('Customer deleted successfully.', 'success')
+    return redirect(url_for('customers'))
+
+# ---------------- Suppliers (List / Add) ----------------
+@app.route('/suppliers', methods=['GET', 'POST'])
+@login_required
+def suppliers():
+    # POST: add supplier (only Admin/Manager)
+    if request.method == 'POST':
+        if current_user.role not in ('Admin', 'Manager'):
+            flash('You do not have permission to add suppliers.', 'error')
+            return redirect(url_for('suppliers'))
+
+        name = request.form.get('name')
+        phone = request.form.get('phone')
+        email = request.form.get('email')
+        address = request.form.get('address')
+        gst_number = request.form.get('gst_number')
+
+        if not name:
+            flash('Supplier name is required.', 'error')
+            return redirect(url_for('suppliers'))
+
+        supplier = Supplier(name=name, phone=phone, email=email, address=address, gst_number=gst_number)
+        db.session.add(supplier)
+        db.session.commit()
+        flash('Supplier added successfully.', 'success')
+        return redirect(url_for('suppliers'))
+
+    suppliers_list = Supplier.query.order_by(Supplier.created_at.desc()).all()
+    return render_template('suppliers.html', suppliers=suppliers_list)
+
+# ---------------- Supplier: Add (separate page) ----------------
+@app.route('/suppliers/add', methods=['GET', 'POST'])
+@login_required
+@roles_required('Admin', 'Manager')
+def add_supplier():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        phone = request.form.get('phone')
+        email = request.form.get('email')
+        address = request.form.get('address')
+        gst_number = request.form.get('gst_number')
+
+        if not name:
+            flash('Supplier name is required.', 'error')
+            return redirect(url_for('add_supplier'))
+
+        supplier = Supplier(name=name, phone=phone, email=email, address=address, gst_number=gst_number)
+        db.session.add(supplier)
+        db.session.commit()
+        flash('Supplier created successfully.', 'success')
+        return redirect(url_for('suppliers'))
+
+    return render_template('supplier_form.html', action='Add', supplier=None)
+
+# ---------------- Supplier: Edit ----------------
+@app.route('/suppliers/edit/<int:supplier_id>', methods=['GET', 'POST'])
+@login_required
+@roles_required('Admin', 'Manager')
+def edit_supplier(supplier_id):
+    supplier = Supplier.query.get_or_404(supplier_id)
+    if request.method == 'POST':
+        supplier.name = request.form.get('name') or supplier.name
+        supplier.phone = request.form.get('phone') or supplier.phone
+        supplier.email = request.form.get('email') or supplier.email
+        supplier.address = request.form.get('address') or supplier.address
+        supplier.gst_number = request.form.get('gst_number') or supplier.gst_number
+
+        db.session.commit()
+        flash('Supplier updated successfully.', 'success')
+        return redirect(url_for('suppliers'))
+
+    return render_template('supplier_form.html', action='Edit', supplier=supplier)
+
+# ---------------- Supplier: Delete ----------------
+@app.route('/suppliers/delete/<int:supplier_id>', methods=['POST'])
+@login_required
+@roles_required('Admin', 'Manager')
+def delete_supplier(supplier_id):
+    supplier = Supplier.query.get_or_404(supplier_id)
+    # Optional: prevent delete if supplier has purchases
+    if supplier.purchases:
+        flash('Cannot delete supplier with existing purchases.', 'error')
+        return redirect(url_for('suppliers'))
+
+    db.session.delete(supplier)
+    db.session.commit()
+    flash('Supplier deleted successfully.', 'success')
+    return redirect(url_for('suppliers'))
+
 # ---------------- Inventory ----------------
 @app.route('/inventory', methods=['GET', 'POST'])
 @login_required
@@ -82,7 +259,7 @@ def inventory():
         quantity = request.form.get('quantity')
         price = request.form.get('price', 0)
         description = request.form.get('description', '')
-        
+
         if name and quantity:
             try:
                 quantity_int = int(quantity)
@@ -98,7 +275,7 @@ def inventory():
                 flash('Invalid quantity or price. Please enter numbers.', 'error')
         else:
             flash('Please provide item name and quantity.', 'error')
-    
+
     items = Item.query.all()
     return render_template('inventory.html', items=items)
 
@@ -108,35 +285,50 @@ def inventory():
 @roles_required('Admin', 'Manager', 'Staff')
 def sales():
     items = Item.query.all()
-    
+    customers = Customer.query.order_by(Customer.name).all()
+
     if request.method == 'POST':
         item_id = request.form.get('item_id')
         order_quantity = request.form.get('quantity')
-        
+        customer_id = request.form.get('customer_id')
+
         if item_id and order_quantity:
             try:
                 item = Item.query.get_or_404(int(item_id))
                 order_quantity_int = int(order_quantity)
-                
+
                 if order_quantity_int <= 0:
                     flash('Order quantity must be positive.', 'error')
                 elif order_quantity_int > item.quantity:
                     flash(f'Insufficient stock! Only {item.quantity} available for {item.name}.', 'error')
                 else:
                     order = Order(item_id=item.id, quantity=order_quantity_int)
+
+                    # Assign customer to order if selected
+                    if customer_id and customer_id != "":
+                        try:
+                            cid = int(customer_id)
+                            customer = Customer.query.get(cid)
+                            if customer:
+                                order.customer_id = customer.id
+                        except ValueError:
+                            flash('Invalid customer selection.', 'error')
+
                     db.session.add(order)
                     item.quantity -= order_quantity_int
                     db.session.commit()
-                    
+
                     total = order.total_amount()
-                    flash(f'Order created successfully! Sold {order_quantity_int} x {item.name} for ₹{total}. Stock updated.', 'success')
+                    flash(f'Order created successfully! Sold {order_quantity_int} x {item.name} for ₹{total}.', 'success')
             except ValueError:
-                flash('Invalid quantity. Please enter a number.', 'error')
+                flash('Invalid quantity. Please enter a valid number.', 'error')
         else:
-            flash('Please select an item and enter quantity.', 'error')
-    
-    orders = Order.query.all()
-    return render_template('sales.html', items=items, orders=orders)
+            flash('Please select an item and enter a quantity.', 'error')
+
+    # 👇 Fetch all orders with customer relationship
+    orders = Order.query.order_by(Order.order_date.desc()).all()
+
+    return render_template('sales.html', items=items, customers=customers, orders=orders)
 
 # ---------------- Purchases ----------------
 @app.route('/purchases', methods=['GET', 'POST'])
@@ -144,34 +336,42 @@ def sales():
 @roles_required('Admin', 'Manager')
 def purchases():
     items = Item.query.all()
-    
+    suppliers = Supplier.query.all()  # To select supplier in purchase form
+
     if request.method == 'POST':
         item_id = request.form.get('item_id')
         purchase_quantity = request.form.get('quantity')
-        supplier = request.form.get('supplier', '')
-        
+        supplier_id = request.form.get('supplier_id')  # optional
+
         if item_id and purchase_quantity:
             try:
                 item = Item.query.get_or_404(int(item_id))
                 purchase_quantity_int = int(purchase_quantity)
-                
+
                 if purchase_quantity_int <= 0:
                     flash('Purchase quantity must be positive.', 'error')
                 else:
-                    purchase = Purchase(item_id=item.id, quantity=purchase_quantity_int, supplier=supplier)
+                    purchase = Purchase(item_id=item.id, quantity=purchase_quantity_int)
+                    if supplier_id:
+                        try:
+                            sid = int(supplier_id)
+                            purchase.supplier_id = sid
+                        except ValueError:
+                            pass
+
                     db.session.add(purchase)
                     item.quantity += purchase_quantity_int
                     db.session.commit()
-                    
+
                     total = purchase.total_amount()
                     flash(f'Purchase recorded! Bought {purchase_quantity_int} x {item.name} for ₹{total}. Stock updated to {item.quantity}.', 'success')
             except ValueError:
                 flash('Invalid quantity. Please enter a number.', 'error')
         else:
             flash('Please select an item and enter quantity.', 'error')
-    
+
     purchases_list = Purchase.query.all()
-    return render_template('purchases.html', items=items, purchases=purchases_list)
+    return render_template('purchases.html', items=items, purchases=purchases_list, suppliers=suppliers)
 
 # ---------------- Reports ----------------
 @app.route('/reports')
@@ -186,8 +386,8 @@ def reports():
     low_stock_items = [item for item in Item.query.all() if item.quantity < 5]
     recent_sales = Order.query.order_by(Order.order_date.desc()).limit(5).all()
     recent_purchases = Purchase.query.order_by(Purchase.purchase_date.desc()).limit(5).all()
-    
-    return render_template('reports.html', 
+
+    return render_template('reports.html',
                           sales_total=sales_total, sales_count=sales_count,
                           purchases_total=purchases_total, purchases_count=purchases_count,
                           stock_value=stock_value, low_stock_items=low_stock_items,
@@ -204,7 +404,7 @@ def about():
 def register_test_user():
     if User.query.filter_by(username='testuser').first():
         return 'Test user already exists. Username: testuser, Password: testpassword'
-    
+
     user = User(username='testuser', role='Admin')  # Assign Admin role
     user.set_password('testpassword')
     db.session.add(user)

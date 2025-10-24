@@ -12,12 +12,22 @@
 
 <div class="row mt-3">
     <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
                 <h5>Create New Order</h5>
             </div>
             <div class="card-body">
                 <form method="POST" novalidate>
+                    <div class="mb-3">
+                        <label for="customer_id" class="form-label">Select Customer</label>
+                        <select class="form-select" id="customer_id" name="customer_id">
+                            <option value="">-- Optional: Choose a customer --</option>
+                            {% for customer in customers %}
+                                <option value="{{ customer.id }}">{{ customer.name }}{% if customer.phone %} - {{ customer.phone }}{% endif %}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
                     <div class="mb-3">
                         <label for="item_id" class="form-label">Select Item</label>
                         <select class="form-select" id="item_id" name="item_id" required>
@@ -29,24 +39,27 @@
                             {% endfor %}
                         </select>
                     </div>
+
                     <div class="mb-3">
                         <label for="quantity" class="form-label">Order Quantity</label>
                         <input type="number" class="form-control" id="quantity" name="quantity" min="1" required
                                placeholder="Enter quantity to sell">
                     </div>
-                    <button type="submit" class="btn btn-success">Create Order</button>
+
+                    <button type="submit" class="btn btn-success w-100">Create Order</button>
                 </form>
             </div>
         </div>
     </div>
+
     <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
+        <div class="card shadow-sm">
+            <div class="card-header bg-secondary text-white">
                 <h5>Quick Stats</h5>
             </div>
             <div class="card-body">
-                <p>Total Orders: {{ orders|length if orders else 0 }}</p>
-                <p>Available Items: {{ items|length if items else 0 }}</p>
+                <p><strong>Total Orders:</strong> {{ orders|length if orders else 0 }}</p>
+                <p><strong>Available Items:</strong> {{ items|length if items else 0 }}</p>
             </div>
         </div>
     </div>
@@ -54,20 +67,21 @@
 
 <div class="row mt-4">
     <div class="col-12">
-        <div class="card">
-            <div class="card-header">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
                 <h5>Recent Orders</h5>
             </div>
             <div class="card-body">
                 {% if orders %}
-                    <table class="table table-striped">
-                        <thead>
+                    <table class="table table-striped align-middle">
+                        <thead class="table-dark">
                             <tr>
                                 <th>ID</th>
                                 <th>Item</th>
                                 <th>Quantity</th>
                                 <th>Total (₹)</th>
                                 <th>Date</th>
+                                <th>Customer</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -79,6 +93,16 @@
                                     <td><span class="badge bg-info">{{ order.quantity }}</span></td>
                                     <td>₹{{ "%.2f"|format(order.total_amount()) }}</td>
                                     <td>{{ order.order_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>
+                                        {% if order.customer %}
+                                            {{ order.customer.name }}
+                                            {% if order.customer.phone %}
+                                                <br><small class="text-muted">{{ order.customer.phone }}</small>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-muted">N/A</span>
+                                        {% endif %}
+                                    </td>
                                     <td>
                                         <button class="btn btn-sm btn-outline-primary">View</button>
                                         <button class="btn btn-sm btn-outline-danger">Cancel</button>
@@ -94,4 +118,5 @@
         </div>
     </div>
 </div>
+
 {% endblock %}
