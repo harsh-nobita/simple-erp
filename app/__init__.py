@@ -21,6 +21,16 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 # Import routes after initialization to avoid circular imports
+# Register HRM blueprint if present
+try:
+    from app.hrm import bp as hrm_bp
+    app.register_blueprint(hrm_bp, url_prefix='/hrm')
+except Exception:
+    # If the hrm package isn't available yet, skip registration.
+    # This keeps the app import-safe during incremental development.
+    pass
+
+# Import other routes after initialization to avoid circular imports
 from app import routes
 
 # Optional: Debug print (remove after testing)

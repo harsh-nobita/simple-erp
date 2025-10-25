@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Payroll</h2>
+  <div class="card mb-3">
+    <div class="card-body">
+      <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="row g-2 align-items-end">
+          <div class="col-md-4">
+            {{ form.employee_id.label }}
+            {{ form.employee_id(class_='form-select') }}
+          </div>
+          <div class="col-md-3">
+            {{ form.period_start.label }}
+            {{ form.period_start(class_='form-control') }}
+          </div>
+          <div class="col-md-3">
+            {{ form.period_end.label }}
+            {{ form.period_end(class_='form-control') }}
+          </div>
+          <div class="col-md-2">
+            {{ form.gross_pay.label }}
+            {{ form.gross_pay(class_='form-control') }}
+          </div>
+        </div>
+        <div class="row g-2 mt-2">
+          <div class="col-md-3">
+            {{ form.taxes.label }}
+            {{ form.taxes(class_='form-control') }}
+          </div>
+          <div class="col-md-3">
+            {{ form.submit(class_='btn btn-success mt-2') }}
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <table>
+    <thead><tr><th>Employee</th><th>Period</th><th>Gross</th><th>Taxes</th><th>Net</th></tr></thead>
+    <tbody>
+    {% for p in payrolls %}
+      <tr>
+        <td>{{ p.employee.name if p.employee else p.employee_id }}</td>
+        <td>{{ p.period_start }} - {{ p.period_end }}</td>
+        <td>{{ p.gross_pay }}</td>
+        <td>{{ p.taxes }}</td>
+        <td>{{ p.net_pay }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5">No payroll records.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

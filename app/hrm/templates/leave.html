@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Leave Requests</h2>
+  <div class="card mb-3">
+    <div class="card-body">
+      <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="row g-2 align-items-end">
+          <div class="col-md-4">
+            {{ form.employee_id.label }}
+            {{ form.employee_id(class_='form-select') }}
+          </div>
+          <div class="col-md-3">
+            {{ form.start_date.label }}
+            {{ form.start_date(class_='form-control') }}
+          </div>
+          <div class="col-md-3">
+            {{ form.end_date.label }}
+            {{ form.end_date(class_='form-control') }}
+          </div>
+          <div class="col-md-2">
+            {{ form.leave_type.label }}
+            {{ form.leave_type(class_='form-control') }}
+          </div>
+        </div>
+        <div class="row g-2 mt-2">
+          <div class="col-md-8">
+            {{ form.reason.label }}
+            {{ form.reason(class_='form-control') }}
+          </div>
+          <div class="col-md-4">
+            {{ form.submit(class_='btn btn-primary mt-4') }}
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <table>
+    <thead><tr><th>Employee</th><th>Period</th><th>Type</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for l in leaves %}
+      <tr>
+        <td>{{ l.employee.name if l.employee else l.employee_id }}</td>
+        <td>{{ l.start_date }} - {{ l.end_date }}</td>
+        <td>{{ l.leave_type }}</td>
+        <td>{{ l.status }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="4">No leaves found.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

@@ -50,4 +50,47 @@
         <p>Use the navigation bar to manage inventory, sales, purchases, or view reports.</p>
     </div>
 </div>
+<!-- HRM quick links -->
+<div class="row mt-4">
+    <div class="col-12">
+        <h3>Human Resources</h3>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-people-fill"></i> Employees</h5>
+                <p class="card-text">Manage employee records.</p>
+                <a href="{{ url_for('hrm.employees') }}" class="btn btn-primary">Open</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-journal-check"></i> Attendance</h5>
+                <p class="card-text">View and record attendance.</p>
+                <a href="{{ url_for('hrm.attendance') }}" class="btn btn-primary">Open</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-cash-stack"></i> Payroll</h5>
+                <p class="card-text">Process payroll runs.</p>
+                <a href="{{ url_for('hrm.payroll') }}" class="btn btn-primary">Open</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-file-earmark-text"></i> Leaves</h5>
+                <p class="card-text">Review leave requests.</p>
+                <a href="{{ url_for('hrm.leaves') }}" class="btn btn-primary">Open</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
