@@ -30,6 +30,14 @@ except Exception:
     # This keeps the app import-safe during incremental development.
     pass
 
+# Register Finance blueprint if present
+try:
+    from app.finance import bp as finance_bp
+    app.register_blueprint(finance_bp, url_prefix='/finance')
+except Exception:
+    # Keep import-safe during incremental development
+    pass
+
 # Import other routes after initialization to avoid circular imports
 from app import routes
 

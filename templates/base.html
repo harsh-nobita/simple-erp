@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <!-- HRM module styles -->
     <link rel="stylesheet" href="{{ url_for('hrm.static', filename='hrm.css') }}">
+    <!-- Finance module styles -->
+    <link rel="stylesheet" href="{{ url_for('finance.static', filename='finance.css') }}">
 </head>
 
 <body>
@@ -75,6 +77,18 @@
                                 <li><a class="dropdown-item" href="{{ url_for('hrm.leaves') }}">Leaves</a></li>
                             </ul>
                         </li>
+                        <!-- Finance dropdown for Admin/Manager -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="financeDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Finance
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="financeDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('finance.billing') }}">Billing</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('finance.expenses') }}">Expenses</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('finance.taxes') }}">Taxes</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('finance.accounts_summary') }}">Accounts Summary</a></li>
+                            </ul>
+                        </li>
                         <!-- HRM links for Staff (limited) -->
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('hrm.employees') }}">Employees</a>
@@ -118,5 +132,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- HRM module script -->
     <script src="{{ url_for('hrm.static', filename='hrm.js') }}"></script>
+    <!-- Finance module script -->
+    <script src="{{ url_for('finance.static', filename='finance.js') }}"></script>
 </body>
 </html>

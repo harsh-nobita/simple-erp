@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Expenses</h2>
+  {% if form %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="row g-2 align-items-end">
+          <div class="col-md-4">
+            {{ form.description.label }}
+            {{ form.description(class_='form-control') }}
+            {% if form.description.errors %}
+              <div class="text-danger small">{% for e in form.description.errors %}{{ e }}<br>{% endfor %}</div>
+            {% endif %}
+          </div>
+          <div class="col-md-2">
+            {{ form.amount.label }}
+            {{ form.amount(class_='form-control') }}
+            {% if form.amount.errors %}
+              <div class="text-danger small">{% for e in form.amount.errors %}{{ e }}<br>{% endfor %}</div>
+            {% endif %}
+          </div>
+          <div class="col-md-3">
+            {{ form.date.label }}
+            {{ form.date(class_='form-control') }}
+            {% if form.date.errors %}
+              <div class="text-danger small">{% for e in form.date.errors %}{{ e }}<br>{% endfor %}</div>
+            {% endif %}
+          </div>
+          <div class="col-md-3">
+            {{ form.category.label }}
+            {{ form.category(class_='form-control') }}
+            {% if form.category.errors %}
+              <div class="text-danger small">{% for e in form.category.errors %}{{ e }}<br>{% endfor %}</div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="mt-2">{{ form.submit(class_='btn btn-primary') }}</div>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+
+  <table>
+    <thead><tr><th>Description</th><th>Amount</th><th>Date</th><th>Category</th></tr></thead>
+    <tbody>
+    {% for e in expenses %}
+      <tr>
+        <td>{{ e.description }}</td>
+        <td>{{ e.amount }}</td>
+        <td>{{ e.date }}</td>
+        <td>{{ e.category }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="4">No expenses found.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
