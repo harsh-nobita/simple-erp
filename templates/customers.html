@@ -15,9 +15,7 @@
     <!-- Add Customer Form -->
     <div class="col-md-4">
         <div class="card">
-            <div class="card-header">
-                <h5>Add New Customer</h5>
-            </div>
+            <div class="card-header"><h5>Add New Customer</h5></div>
             <div class="card-body">
                 <form method="POST" novalidate>
                     <div class="mb-3">
@@ -49,12 +47,10 @@
     <!-- Customers List -->
     <div class="col-md-8">
         <div class="card">
-            <div class="card-header">
-                <h5>Existing Customers</h5>
-            </div>
+            <div class="card-header"><h5>Existing Customers</h5></div>
             <div class="card-body">
                 {% if customers %}
-                    <table class="table table-striped table-hover">
+                    <table class="table table-striped table-hover table-sm">
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -76,7 +72,20 @@
                                 <td>{{ customer.address }}</td>
                                 <td>{{ customer.gst_number }}</td>
                                 <td>
-                                    <a href="{{ url_for('edit_customer', customer_id=customer.id) }}" class="btn btn-sm btn-primary">Edit</a>
+                                    <!-- Edit button triggers modal -->
+                                    <button class="btn btn-sm btn-primary" 
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editCustomerModal"
+                                            data-id="{{ customer.id }}"
+                                            data-name="{{ customer.name }}"
+                                            data-phone="{{ customer.phone }}"
+                                            data-email="{{ customer.email }}"
+                                            data-address="{{ customer.address }}"
+                                            data-gst="{{ customer.gst_number }}">
+                                        Edit
+                                    </button>
+
+                                    <!-- Delete Form -->
                                     <form action="{{ url_for('delete_customer', customer_id=customer.id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure to delete this customer?');">
                                         <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                                     </form>
@@ -92,4 +101,62 @@
         </div>
     </div>
 </div>
+
+<!-- Edit Customer Modal -->
+<div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" id="editCustomerForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editCustomerLabel">Edit Customer</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="editCustomerId" name="customer_id">
+          <div class="mb-3">
+            <label class="form-label">Name *</label>
+            <input type="text" class="form-control" id="editName" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Phone</label>
+            <input type="text" class="form-control" id="editPhone" name="phone">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" id="editEmail" name="email">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Address</label>
+            <textarea class="form-control" id="editAddress" name="address" rows="2"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">GST Number</label>
+            <input type="text" class="form-control" id="editGST" name="gst_number">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Script to populate modal -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const editModal = document.getElementById('editCustomerModal');
+    editModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        document.getElementById('editCustomerId').value = button.getAttribute('data-id');
+        document.getElementById('editName').value = button.getAttribute('data-name');
+        document.getElementById('editPhone').value = button.getAttribute('data-phone');
+        document.getElementById('editEmail').value = button.getAttribute('data-email');
+        document.getElementById('editAddress').value = button.getAttribute('data-address');
+        document.getElementById('editGST').value = button.getAttribute('data-gst');
+        document.getElementById('editCustomerForm').action = `/edit_customer/${button.getAttribute('data-id')}`;
+    });
+});
+</script>
+
 {% endblock %}

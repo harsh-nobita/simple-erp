@@ -126,39 +126,36 @@ def add_customer():
 
     return render_template('customer_form.html', action='Add', customer=None)
 
-# ---------------- Customer: Edit ----------------
-@app.route('/customers/edit/<int:customer_id>', methods=['GET', 'POST'])
+# ---------------- Edit Customer ----------------
+@app.route('/edit_customer/<int:customer_id>', methods=['POST'])
 @login_required
-@roles_required('Admin', 'Manager')
+@roles_required('Admin', 'Manager', 'Staff')
 def edit_customer(customer_id):
     customer = Customer.query.get_or_404(customer_id)
-    if request.method == 'POST':
-        customer.name = request.form.get('name') or customer.name
-        customer.phone = request.form.get('phone') or customer.phone
-        customer.email = request.form.get('email') or customer.email
-        customer.address = request.form.get('address') or customer.address
-        customer.gst_number = request.form.get('gst_number') or customer.gst_number
+    customer.name = request.form.get('name')
+    customer.phone = request.form.get('phone')
+    customer.email = request.form.get('email')
+    customer.address = request.form.get('address')
+    customer.gst_number = request.form.get('gst_number')
 
-        db.session.commit()
-        flash('Customer updated successfully.', 'success')
+    if not customer.name:
+        flash('Customer name is required.', 'error')
         return redirect(url_for('customers'))
 
-    return render_template('customer_form.html', action='Edit', customer=customer)
+    db.session.commit()
+    flash(f'Customer "{customer.name}" updated successfully!', 'success')
+    return redirect(url_for('customers'))
 
-# ---------------- Customer: Delete ----------------
-@app.route('/customers/delete/<int:customer_id>', methods=['POST'])
+
+# ---------------- Delete Customer ----------------
+@app.route('/delete_customer/<int:customer_id>', methods=['POST'])
 @login_required
-@roles_required('Admin', 'Manager')
+@roles_required('Admin', 'Manager', 'Staff')
 def delete_customer(customer_id):
     customer = Customer.query.get_or_404(customer_id)
-    # Optional: prevent delete if customer has orders
-    if customer.orders:
-        flash('Cannot delete customer with existing orders.', 'error')
-        return redirect(url_for('customers'))
-
     db.session.delete(customer)
     db.session.commit()
-    flash('Customer deleted successfully.', 'success')
+    flash(f'Customer "{customer.name}" deleted successfully.', 'success')
     return redirect(url_for('customers'))
 
 # ---------------- Suppliers (List / Add) ----------------
@@ -279,38 +276,35 @@ def inventory():
     items = Item.query.all()
     return render_template('inventory.html', items=items)
 
-# ----- Edit inventory Item -----
-@app.route('/inventory/edit/<int:item_id>', methods=['GET', 'POST'])
+# ---------------- Edit Inventory Item ----------------
+@app.route('/edit_item/<int:item_id>', methods=['POST'])
 @login_required
-@roles_required('Admin', 'Manager')
+@roles_required('Admin', 'Manager', 'Staff')
 def edit_item(item_id):
     item = Item.query.get_or_404(item_id)
 
-    if request.method == 'POST':
-        name = request.form.get('name')
-        quantity = request.form.get('quantity')
-        price = request.form.get('price')
-        description = request.form.get('description')
+    name = request.form.get('name')
+    quantity = request.form.get('quantity')
+    price = request.form.get('price')
+    description = request.form.get('description')
 
-        # Validation
-        if not name or not quantity or not price:
-            flash('Name, Quantity, and Price are required fields.', 'danger')
-            return redirect(url_for('inventory'))
-
-        try:
-            item.name = name
-            item.quantity = int(quantity)
-            item.price = Decimal(price)
-            item.description = description
-            db.session.commit()
-            flash('Item updated successfully!', 'success')
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error updating item: {str(e)}', 'danger')
-
+    # Validate fields
+    if not name or not quantity or not price:
+        flash('Name, Quantity, and Price are required fields.', 'error')
         return redirect(url_for('inventory'))
 
-    return render_template('edit_item.html', item=item)
+    try:
+        item.name = name
+        item.quantity = int(quantity)
+        item.price = float(price)
+        item.description = description
+        db.session.commit()
+        flash(f'Item "{item.name}" updated successfully!', 'success')
+    except ValueError:
+        flash('Invalid quantity or price format.', 'error')
+
+    return redirect(url_for('inventory'))
+
 
 # ----- Delete inventory Item -----
 @app.route('/inventory/delete/<int:item_id>', methods=['POST'])

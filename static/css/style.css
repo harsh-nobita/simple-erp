@@ -1,3 +1,116 @@
-body { padding-bottom: 40px; }
+/* ===============================
+   Global Compact Layout Styling
+   =============================== */
 
-.card-title { font-weight: 600; }
+/* General page layout */
+body {
+  padding-bottom: 40px;
+  font-size: 0.85rem;          /* smaller text */
+  background-color: #f8f9fa;   /* light gray background */
+}
+
+/* Compact containers */
+.container-fluid {
+  padding: 0.5rem 1rem;
+}
+
+/* Card styling */
+.card {
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  background-color: #fff;
+}
+
+.card-title {
+  font-weight: 600; /* your existing rule retained */
+  font-size: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5 {
+  margin-bottom: 0.5rem;
+}
+
+/* Tables */
+.table th, .table td {
+  padding: 0.4rem 0.5rem;
+  font-size: 0.82rem;
+  vertical-align: middle;
+}
+
+.table {
+  background-color: #fff;
+  border-radius: 0.4rem;
+  overflow: hidden;
+}
+
+/* Buttons */
+.btn {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.82rem;
+  border-radius: 0.3rem;
+}
+
+/* Navbar */
+.navbar {
+  padding: 0.3rem 0.8rem;
+}
+
+.navbar-brand {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* Form Controls */
+.form-control,
+.form-select {
+  padding: 0.3rem 0.5rem;
+  font-size: 0.82rem;
+  border-radius: 0.3rem;
+}
+
+/* Dashboard grid for compact info cards */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.5rem;
+}
+
+/* Reduce margins on alert messages and spacing */
+.alert {
+  padding: 0.4rem 0.7rem;
+  font-size: 0.82rem;
+  margin-bottom: 0.6rem;
+}
+
+/* Compact modals if used */
+.modal-content {
+  padding: 0.75rem;
+  font-size: 0.85rem;
+}
+
+/* Table action buttons */
+.action-btn {
+  padding: 0.2rem 0.4rem;
+  font-size: 0.75rem;
+}
+
+/* Card headers compact */
+.card-header {
+  padding: 0.4rem 0.6rem;
+  font-size: 0.85rem;
+}
+
+/* Optional: compact section headers */
+.section-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+/* ===============================
+   End Compact Styling
+   =============================== */
