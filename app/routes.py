@@ -29,9 +29,20 @@ def dashboard():
     total_orders = Order.query.count()
     total_purchases = Purchase.query.count()
     total_stock_value = sum(item.total_value() for item in Item.query.all())
-    return render_template('dashboard.html',
-                           total_items=total_items, total_orders=total_orders,
-                           total_purchases=total_purchases, total_stock_value=total_stock_value)
+    # Optional section selector from query string to show modules for a section
+    from flask import request
+    selected_section = request.args.get('section')
+
+    # If requested via AJAX (or partial param), return only the dashboard content fragment.
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.args.get('partial') == '1'
+    context = dict(total_items=total_items, total_orders=total_orders,
+                   total_purchases=total_purchases, total_stock_value=total_stock_value,
+                   selected_section=selected_section)
+
+    if is_ajax:
+        return render_template('_dashboard_content.html', **context)
+
+    return render_template('dashboard.html', **context)
 
 # ---------------- Login with Role ----------------
 @app.route('/login', methods=['GET', 'POST'])

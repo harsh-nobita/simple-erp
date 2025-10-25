@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Follow-ups</h2>
+  {% if form %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="row g-2">
+          <div class="col-md-6">{{ form.quotation_id.label }}{{ form.quotation_id(class_='form-select') }}</div>
+          <div class="col-md-6">{{ form.followup_date.label }}{{ form.followup_date(class_='form-control') }}</div>
+        </div>
+        <div class="mt-2">{{ form.submit(class_='btn btn-primary') }}</div>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+
+  <p>Follow-up scheduling will appear here (placeholder).</p>
+{% endblock %}

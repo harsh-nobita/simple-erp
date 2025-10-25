@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Tickets</h2>
+  {% if form %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="row g-2">
+          <div class="col-md-4">{{ form.lead_id.label }}{{ form.lead_id(class_='form-select') }}</div>
+          <div class="col-md-4">{{ form.subject.label }}{{ form.subject(class_='form-control') }}</div>
+          <div class="col-md-4">{{ form.description.label }}{{ form.description(class_='form-control') }}</div>
+        </div>
+        <div class="mt-2">{{ form.submit(class_='btn btn-primary') }}</div>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+
+  <table class="table">
+    <thead><tr><th>Ticket ID</th><th>Lead</th><th>Subject</th><th>Status</th><th>Created</th></tr></thead>
+    <tbody>
+    {% for t in tickets %}
+      <tr>
+        <td>{{ t.ticket_id }}</td>
+        <td>{{ t.lead.lead_id if t.lead else '-' }}</td>
+        <td>{{ t.subject }}</td>
+        <td>{{ t.status }}</td>
+        <td>{{ t.created_at }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5">No tickets found.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

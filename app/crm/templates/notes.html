@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Notes</h2>
+  {% if form %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="row g-2">
+          <div class="col-md-4">{{ form.lead_id.label }}{{ form.lead_id(class_='form-select') }}</div>
+          <div class="col-md-8">{{ form.content.label }}{{ form.content(class_='form-control') }}</div>
+        </div>
+        <div class="mt-2">{{ form.submit(class_='btn btn-primary') }}</div>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+
+  <table class="table">
+    <thead><tr><th>Lead</th><th>Note</th><th>Created</th></tr></thead>
+    <tbody>
+    {% for n in notes %}
+      <tr>
+        <td>{{ n.lead.lead_id if n.lead else n.lead_id }}</td>
+        <td>{{ n.content }}</td>
+        <td>{{ n.created_at }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="3">No notes found.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

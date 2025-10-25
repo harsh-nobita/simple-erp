@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>CRM Dashboard</h2>
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Leads</h5>
+          <p class="card-text">{{ leads_count or 0 }}</p>
+          <a href="{{ url_for('crm.leads') }}" class="btn btn-primary">Manage Leads</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Tickets</h5>
+          <p class="card-text">{{ tickets_count or 0 }}</p>
+          <a href="{{ url_for('crm.tickets') }}" class="btn btn-primary">Manage Tickets</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Quotations</h5>
+          <p class="card-text">{{ quotations_count or 0 }}</p>
+          <a href="{{ url_for('crm.quotations') }}" class="btn btn-primary">Manage Quotations</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

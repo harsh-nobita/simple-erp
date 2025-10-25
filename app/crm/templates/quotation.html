@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Quotations</h2>
+  {% if form %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="row g-2">
+          <div class="col-md-4">{{ form.lead_id.label }}{{ form.lead_id(class_='form-select') }}</div>
+          <div class="col-md-4">{{ form.reference.label }}{{ form.reference(class_='form-control') }}</div>
+          <div class="col-md-4">{{ form.amount.label }}{{ form.amount(class_='form-control') }}</div>
+        </div>
+        <div class="mt-2">{{ form.submit(class_='btn btn-primary') }}</div>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+
+  <table class="table">
+    <thead><tr><th>Reference</th><th>Lead</th><th>Amount</th><th>Status</th><th>Created</th></tr></thead>
+    <tbody>
+    {% for q in quotations %}
+      <tr>
+        <td>{{ q.reference }}</td>
+        <td>{{ q.lead.lead_id if q.lead else '-' }}</td>
+        <td>{{ q.amount }}</td>
+        <td>{{ q.status }}</td>
+        <td>{{ q.created_at }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5">No quotations found.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

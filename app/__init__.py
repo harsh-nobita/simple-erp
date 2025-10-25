@@ -38,6 +38,13 @@ except Exception:
     # Keep import-safe during incremental development
     pass
 
+# Register CRM blueprint if present
+try:
+    from app.crm import bp as crm_bp
+    app.register_blueprint(crm_bp, url_prefix='/crm')
+except Exception:
+    pass
+
 # Import other routes after initialization to avoid circular imports
 from app import routes
 

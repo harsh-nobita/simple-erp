@@ -1,0 +1,9 @@
+/* CRM specific styles */
+
+.table {
+  width: 100%;
+}
+
+.card .card-body h5 {
+  margin-bottom: .5rem;
+}

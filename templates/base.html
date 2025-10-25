@@ -15,6 +15,8 @@
     <link rel="stylesheet" href="{{ url_for('hrm.static', filename='hrm.css') }}">
     <!-- Finance module styles -->
     <link rel="stylesheet" href="{{ url_for('finance.static', filename='finance.css') }}">
+    <!-- CRM module styles -->
+    <link rel="stylesheet" href="{{ url_for('crm.static', filename='css/crm.css') }}">
 </head>
 
 <body>
@@ -89,6 +91,18 @@
                                 <li><a class="dropdown-item" href="{{ url_for('finance.accounts_summary') }}">Accounts Summary</a></li>
                             </ul>
                         </li>
+                        <!-- CRM dropdown for Admin/Manager -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="crmDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                CRM
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="crmDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('crm.leads') }}">Leads</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('crm.tickets') }}">Tickets</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('crm.notes') }}">Notes</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('crm.quotations') }}">Quotations</a></li>
+                            </ul>
+                        </li>
                         <!-- HRM links for Staff (limited) -->
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('hrm.employees') }}">Employees</a>
@@ -114,19 +128,60 @@
         </div>
     </nav>
 
-    <div class="container mt-4">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- Left sidebar -->
+            <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link {% if not request.args.get('section') and request.endpoint=='dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">
+                                <i class="bi bi-speedometer2"></i> Overview
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.args.get('section')=='hrm' %}active{% endif %}" href="{{ url_for('dashboard', section='hrm') }}">HRM</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.args.get('section')=='finance' %}active{% endif %}" href="{{ url_for('dashboard', section='finance') }}">Finance</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.args.get('section')=='crm' %}active{% endif %}" href="{{ url_for('dashboard', section='crm') }}">CRM</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('inventory') }}">Inventory</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('sales') }}">Sales</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('purchases') }}">Purchases</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('reports') }}">Reports</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
 
-        {% block content %}{% endblock %}
+            <!-- Main content -->
+            <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <div id="main-content-area">
+                    {% block content %}{% endblock %}
+                </div>
+            </main>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -134,5 +189,9 @@
     <script src="{{ url_for('hrm.static', filename='hrm.js') }}"></script>
     <!-- Finance module script -->
     <script src="{{ url_for('finance.static', filename='finance.js') }}"></script>
+    <!-- CRM module script -->
+    <script src="{{ url_for('crm.static', filename='js/crm.js') }}"></script>
+    <!-- Dashboard AJAX loader -->
+    <script src="{{ url_for('static', filename='js/dashboard_ajax.js') }}"></script>
 </body>
 </html>
