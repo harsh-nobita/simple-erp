@@ -1,0 +1,19 @@
+# Navigate to your project folder if not already there
+cd C:\Users\91999\Desktop\erp_project\simple-erp-mvp
+
+# Activate the virtual environment
+.\venv\Scripts\Activate.ps1
+
+# HNS ERP app will be started on 127.0.0.1:5000
+
+now it will ask you about login credentials
+i have created test_users 
+ [
+        {"username": "admin", "password": "adminpass", "role": "Admin"},
+        {"username": "manager", "password": "managerpass", "role": "Manager"},
+        {"username": "staff", "password": "staffpass", "role": "Staff"}
+ ]
+
+ now we can check the features after the login.
+
+ we can customize the features and add new features also

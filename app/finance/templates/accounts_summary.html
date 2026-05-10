@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Accounts Summary</h2>
+  <div class="card mb-3">
+    <div class="card-body">
+      <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="row g-2">
+          <div class="col-md-4">
+            {{ form.period_start.label }}
+            {{ form.period_start(class_='form-control') }}
+            {% if form.period_start.errors %}
+              <div class="text-danger small">{% for e in form.period_start.errors %}{{ e }}<br>{% endfor %}</div>
+            {% endif %}
+          </div>
+          <div class="col-md-4">
+            {{ form.period_end.label }}
+            {{ form.period_end(class_='form-control') }}
+            {% if form.period_end.errors %}
+              <div class="text-danger small">{% for e in form.period_end.errors %}{{ e }}<br>{% endfor %}</div>
+            {% endif %}
+          </div>
+          <div class="col-md-4">{{ form.submit(class_='btn btn-primary mt-4') }}</div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {% if summary %}
+    <div class="card">
+      <div class="card-body">
+        <p>Period: {{ summary.period_start }} - {{ summary.period_end }}</p>
+        <p>Total billed: {{ summary.total_billed }}</p>
+        <p>Total expenses: {{ summary.total_expenses }}</p>
+        <p><strong>Net: {{ summary.net }}</strong></p>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}

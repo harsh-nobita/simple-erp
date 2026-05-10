@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Leads</h2>
+  {% if form %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="row g-2">
+          <div class="col-md-4">{{ form.name.label }}{{ form.name(class_='form-control') }}{% if form.name.errors %}<div class="text-danger small">{% for e in form.name.errors %}{{ e }}<br>{% endfor %}</div>{% endif %}</div>
+          <div class="col-md-4">{{ form.email.label }}{{ form.email(class_='form-control') }}{% if form.email.errors %}<div class="text-danger small">{% for e in form.email.errors %}{{ e }}<br>{% endfor %}</div>{% endif %}</div>
+          <div class="col-md-2">{{ form.phone.label }}{{ form.phone(class_='form-control') }}</div>
+          <div class="col-md-2">{{ form.source.label }}{{ form.source(class_='form-control') }}</div>
+        </div>
+        <div class="mt-2">{{ form.submit(class_='btn btn-primary') }}</div>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+
+  <table class="table">
+    <thead><tr><th>Lead ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Source</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for l in leads %}
+      <tr>
+        <td>{{ l.lead_id }}</td>
+        <td>{{ l.name }}</td>
+        <td>{{ l.email }}</td>
+        <td>{{ l.phone }}</td>
+        <td>{{ l.source }}</td>
+        <td>{{ l.status }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6">No leads found.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

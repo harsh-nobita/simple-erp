@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Employees</h2>
+  <p><a href="{{ url_for('hrm.new_employee') }}">Add new employee</a></p>
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Name</th><th>Email</th><th>Position</th><th>Department</th></tr>
+    </thead>
+    <tbody>
+    {% for e in employees %}
+      <tr>
+        <td>{{ e.id }}</td>
+        <td>{{ e.name }}</td>
+        <td>{{ e.email }}</td>
+        <td>{{ e.position }}</td>
+        <td>{{ e.department }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5">No employees found.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Employee</h2>
+  <form method="post">
+    {{ form.hidden_tag() }}
+    <p>
+      {{ form.name.label }}<br>
+      {{ form.name(size=40) }}
+    </p>
+    <p>
+      {{ form.email.label }}<br>
+      {{ form.email(size=40) }}
+    </p>
+    <p>
+      {{ form.position.label }}<br>
+      {{ form.position(size=40) }}
+    </p>
+    <p>
+      {{ form.department.label }}<br>
+      {{ form.department(size=40) }}
+    </p>
+    <p>
+      {{ form.date_hired.label }}<br>
+      {{ form.date_hired() }}
+    </p>
+    <p>
+      {{ form.salary.label }}<br>
+      {{ form.salary() }}
+    </p>
+    <p>{{ form.submit() }}</p>
+  </form>
+{% endblock %}

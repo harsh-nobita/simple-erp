@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About HNS ERP System</title>
+    <!-- Bootstrap CSS (optional, for styling) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 70px;
+            font-family: Arial, sans-serif;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        .feature-list li {
+            margin-bottom: 10px;
+        }
+        .container {
+            max-width: 900px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar (example, adjust as per your existing navbar) -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('dashboard') }}">HNS ERP</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('about') }}">About HNS ERP</a>
+                    </li>
+                    <!-- Add other nav links here -->
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1>About HNS ERP System</h1>
+        <p>
+            <strong>HNS ERP System</strong> is a lightweight yet powerful enterprise resource planning (ERP) platform 
+            designed for small to medium businesses. It streamlines core business operations, giving you full control 
+            over inventory, sales, purchases, and invoicing — all from a single, intuitive interface.
+        </p>
+
+        <h2>Key Features</h2>
+        <ul class="feature-list">
+            <li><strong>Centralized Dashboard:</strong> View real-time summaries of inventory, sales, purchases, and stock valuation. Track key business metrics at a glance.</li>
+            <li><strong>Inventory Management:</strong> Add, edit, and track all your products with ease. Monitor stock levels and automatically identify low-stock items. Set product prices and manage detailed descriptions.</li>
+            <li><strong>Sales Management:</strong> Create and manage orders efficiently. Automatic deduction of sold items from inventory. Track total sales, customer orders, and recent transactions.</li>
+            <li><strong>Purchase Management:</strong> Record supplier purchases and update inventory in real-time. Monitor total expenditure on purchases. Keep supplier information organized and accessible.</li>
+            <li><strong>Invoice Generation & PDF Export:</strong> Generate professional invoices with your company name, PO number, and PO date. Download invoices as PDF instantly. Link invoice details to actual orders for accurate billing.</li>
+            <li><strong>Reports & Analytics:</strong> View detailed sales and purchase summaries. Analyze stock value and movement trends. Access recent transactions to make informed decisions.</li>
+            <li><strong>User Management & Security:</strong> Secure login system with user authentication. Option to create multiple users with controlled access. Built-in test user for quick setup and demonstration.</li>
+            <li><strong>Easy Deployment & Accessibility:</strong> Web-based application accessible from any device with internet. Compatible with both local and cloud hosting (Render, Heroku, etc.). Lightweight and optimized for small to medium business operations.</li>
+            <li><strong>Future-Ready & Extensible:</strong> Built with Flask and SQLAlchemy, making it easy to customize. Ready for integration with other business tools and modules. Designed to grow with your business needs.</li>
+        </ul>
+
+        <h2>Why Choose HNS ERP System?</h2>
+        <ul class="feature-list">
+            <li><strong>Saves Time:</strong> Automate inventory, sales, and purchase tracking.</li>
+            <li><strong>Reduces Errors:</strong> Accurate stock and order management.</li>
+            <li><strong>Professional Billing:</strong> Generate invoices quickly and efficiently.</li>
+            <li><strong>Affordable & Scalable:</strong> Perfect for SMEs looking for an all-in-one solution.</li>
+            <li><strong>Accessible Anywhere:</strong> Cloud deployment ensures your business runs smoothly online.</li>
+        </ul>
+
+        <p>
+            <strong>HNS ERP System</strong> is your complete solution to streamline operations, improve efficiency, and take control of your business growth.
+        </p>
+    </div>
+
+    <!-- Bootstrap JS (optional, for responsive navbar) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

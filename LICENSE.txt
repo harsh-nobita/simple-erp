@@ -1,0 +1,14 @@
+PROPRIETARY LICENSE
+
+Copyright (c) 2025 Harsh Nobita
+
+All rights reserved.
+
+Permission to use, copy, modify, and distribute this software and its
+documentation for internal business purposes is granted only under the
+terms of a separate commercial license agreement. This software is
+provided "as is", without warranty of any kind. In no event shall the
+authors be liable for any claim, damages, or other liability arising
+from the use of the software.
+
+Contact: legal@example.com

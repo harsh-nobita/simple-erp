@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Warehouse - Simple ERP{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="fs-3"><i class="bi bi-building"></i> Edit Warehouse</h1>
+        <a href="{{ url_for('warehouses') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-6 offset-md-3">
+        <div class="card small-box shadow-sm">
+            <div class="card-header py-2">
+                <h6 class="mb-0">Edit Warehouse: {{ warehouse.name }}</h6>
+            </div>
+            <div class="card-body p-3">
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div class="mb-2">
+                        <label class="form-label small">{{ form.name.label }}</label>
+                        {{ form.name(class="form-control form-control-sm") }}
+                        {% if form.name.errors %}
+                            <div class="text-danger small">{{ form.name.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small">{{ form.location.label }}</label>
+                        {{ form.location(class="form-control form-control-sm") }}
+                        {% if form.location.errors %}
+                            <div class="text-danger small">{{ form.location.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small">{{ form.manager_name.label }}</label>
+                        {{ form.manager_name(class="form-control form-control-sm") }}
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small">{{ form.phone.label }}</label>
+                        {{ form.phone(class="form-control form-control-sm") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.submit(class="btn btn-primary btn-sm") }}
+                        <a href="{{ url_for('warehouses') }}" class="btn btn-secondary btn-sm">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Billing</h2>
+  {% if form %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="row g-2 align-items-end">
+          <div class="col-md-3">
+            {{ form.reference.label }}
+            {{ form.reference(class_='form-control') }}
+            {% if form.reference.errors %}
+              <div class="text-danger small">{% for e in form.reference.errors %}{{ e }}<br>{% endfor %}</div>
+            {% endif %}
+          </div>
+          <div class="col-md-3">
+            {{ form.customer.label }}
+            {{ form.customer(class_='form-control') }}
+            {% if form.customer.errors %}
+              <div class="text-danger small">{% for e in form.customer.errors %}{{ e }}<br>{% endfor %}</div>
+            {% endif %}
+          </div>
+          <div class="col-md-2">
+            {{ form.amount.label }}
+            {{ form.amount(class_='form-control') }}
+            {% if form.amount.errors %}
+              <div class="text-danger small">{% for e in form.amount.errors %}{{ e }}<br>{% endfor %}</div>
+            {% endif %}
+          </div>
+          <div class="col-md-2">
+            {{ form.tax_id.label }}
+            {{ form.tax_id(class_='form-select') }}
+            {% if form.tax_id.errors %}
+              <div class="text-danger small">{% for e in form.tax_id.errors %}{{ e }}<br>{% endfor %}</div>
+            {% endif %}
+          </div>
+          <div class="col-md-2">{{ form.paid() }} {{ form.paid.label }}</div>
+        </div>
+        <div class="mt-2">{{ form.submit(class_='btn btn-primary') }}</div>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+
+  <table>
+    <thead><tr><th>Ref</th><th>Customer</th><th>Amount</th><th>Tax</th><th>Date</th><th>Paid</th></tr></thead>
+    <tbody>
+    {% for b in bills %}
+      <tr>
+        <td>{{ b.reference }}</td>
+        <td>{{ b.customer }}</td>
+        <td>{{ b.amount }}</td>
+        <td>{{ b.tax.name if b.tax else '-' }}</td>
+        <td>{{ b.date_issued }}</td>
+        <td>{{ 'Yes' if b.paid else 'No' }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6">No bills found.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

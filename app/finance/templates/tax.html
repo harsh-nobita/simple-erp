@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Taxes</h2>
+  <div class="card mb-3">
+    <div class="card-body">
+      <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="row g-2">
+          <div class="col-md-6">
+            {{ form.name.label }}
+            {{ form.name(class_='form-control') }}
+            {% if form.name.errors %}
+              <div class="text-danger small">{% for e in form.name.errors %}{{ e }}<br>{% endfor %}</div>
+            {% endif %}
+          </div>
+          <div class="col-md-4">
+            {{ form.rate.label }}
+            {{ form.rate(class_='form-control') }}
+            {% if form.rate.errors %}
+              <div class="text-danger small">{% for e in form.rate.errors %}{{ e }}<br>{% endfor %}</div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="mt-2">{{ form.submit(class_='btn btn-primary') }}</div>
+      </form>
+    </div>
+  </div>
+
+  <table>
+    <thead><tr><th>Name</th><th>Rate (%)</th></tr></thead>
+    <tbody>
+    {% for t in taxes %}
+      <tr>
+        <td>{{ t.name }}</td>
+        <td>{{ t.rate }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="2">No taxes defined.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

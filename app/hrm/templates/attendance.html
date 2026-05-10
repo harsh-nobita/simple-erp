@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Attendance Records</h2>
+  <div class="card mb-3">
+    <div class="card-body">
+      <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="row g-2 align-items-end">
+          <div class="col-md-4">
+            {{ form.employee_id.label }}
+            {{ form.employee_id(class_='form-select') }}
+          </div>
+          <div class="col-md-3">
+            {{ form.date.label }}
+            {{ form.date(class_='form-control') }}
+          </div>
+          <div class="col-md-3">
+            {{ form.status.label }}
+            {{ form.status(class_='form-select') }}
+          </div>
+          <div class="col-md-2">
+            {{ form.submit(class_='btn btn-primary') }}
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <table>
+    <thead><tr><th>Employee</th><th>Date</th><th>Status</th><th>Check In</th><th>Check Out</th></tr></thead>
+    <tbody>
+    {% for r in records %}
+      <tr>
+        <td>{{ r.employee.name if r.employee else r.employee_id }}</td>
+        <td>{{ r.date }}</td>
+        <td>{{ r.status }}</td>
+        <td>{{ r.check_in or '-' }}</td>
+        <td>{{ r.check_out or '-' }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5">No attendance records.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
